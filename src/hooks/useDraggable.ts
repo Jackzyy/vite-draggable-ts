@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 
-export default function useDraggable(ref: Ref | null) {
+export default function useDraggable(target: Ref) {
   const pressedDelta = {
     x: 0,
     y: 0
@@ -12,12 +12,12 @@ export default function useDraggable(ref: Ref | null) {
   })
 
   const start = (e: MouseEvent) => {
-    e.stopPropagation()
-    pressedDelta.x = e.offsetX
-    pressedDelta.y = e.offsetY
+    const rect = target.value.getBoundingClientRect()
+    pressedDelta.x = e.pageX - rect.left
+    pressedDelta.y = e.pageY - rect.top
 
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', end)
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseup', end)
   }
 
   const move = (e: MouseEvent) => {
@@ -26,12 +26,12 @@ export default function useDraggable(ref: Ref | null) {
   }
 
   const end = () => {
-    window.removeEventListener('mousemove', move)
-    window.removeEventListener('mouseup', end)
+    document.removeEventListener('mousemove', move)
+    document.removeEventListener('mouseup', end)
   }
 
   onMounted(() => {
-    if (ref?.value) ref.value.addEventListener('mousedown', start)
+    if (target) target.value.addEventListener('mousedown', start)
   })
 
   return {
