@@ -56,6 +56,10 @@ const setPointStyle = (point: string) => {
 
   return style
 }
+
+const handleClick = () => {
+  dr.value.style.left = '250px'
+}
 </script>
 
 <template>
@@ -67,6 +71,7 @@ const setPointStyle = (point: string) => {
       :class="item"
       :style="setPointStyle(item)"
     />
+    <el-button type="primary" @click="handleClick">primary2</el-button>
     <slot />
   </div>
 </template>

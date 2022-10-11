@@ -10,10 +10,17 @@ const onDrag = (val: any) => {
 </script>
 
 <template>
-  <draggable-resizable @dragging="onDrag">
-    <el-button type="primary">primary</el-button>
-    <pre>{{ states.position }}</pre>
-  </draggable-resizable>
+  <main>
+    <draggable-resizable @dragging="onDrag">
+      <el-button type="primary">primary</el-button>
+      <pre>{{ states.position }}</pre>
+    </draggable-resizable>
+  </main>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+main {
+  width: 100vw;
+  height: 100vh;
+}
+</style>

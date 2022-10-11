@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import useMutationObserver from './useMutationObserver'
 
 export default function useDraggable(target: Ref) {
   const states = reactive({
@@ -15,10 +16,6 @@ export default function useDraggable(target: Ref) {
     pressedDelta: {
       x: 0,
       y: 0
-    },
-    position: {
-      x: 0,
-      y: 0
     }
   })
 
@@ -33,11 +30,8 @@ export default function useDraggable(target: Ref) {
   }
 
   const move = (e: MouseEvent) => {
-    states.position = {
-      x: e.clientX - states.pressedDelta.x,
-      y: e.clientY - states.pressedDelta.y
-    }
-
+    states.target.x = e.clientX - states.pressedDelta.x
+    states.target.y = e.clientY - states.pressedDelta.y
     update()
   }
 
@@ -47,20 +41,24 @@ export default function useDraggable(target: Ref) {
   }
 
   const update = () => {
+    target.value.style.position = 'absolute'
+    target.value.style.left = `${states.target.x}px`
+    target.value.style.top = `${states.target.y}px`
+
     const rect = target.value.getBoundingClientRect()
     states.target = rect.toJSON()
-
-    target.value.style.position = 'absolute'
-    target.value.style.left = `${states.position.x}px`
-    target.value.style.top = `${states.position.y}px`
   }
 
   onMounted(() => {
-    if (target) {
-      update()
-      target.value.addEventListener('mousedown', start)
-    }
+    update()
+    target.value.addEventListener('mousedown', start)
   })
 
+  useMutationObserver(target, () => {
+    const rect = target.value.getBoundingClientRect()
+    states.target = rect.toJSON()
+
+    update()
+  })
   return computed(() => states.target)
 }
