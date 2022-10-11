@@ -6,7 +6,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["element-plus/global"]
+    "types": ["element-plus/global"],
+    "suppressImplicitAnyIndexErrors": true
   },
 
   "references": [

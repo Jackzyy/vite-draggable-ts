@@ -1,32 +1,44 @@
 import type { Ref } from 'vue'
 
 export default function useDraggable(target: Ref) {
-  const pressedDelta = {
-    x: 0,
-    y: 0
-  }
-
-  const position = reactive({
-    x: 0,
-    y: 0
+  const states = reactive({
+    target: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
+    pressedDelta: {
+      x: 0,
+      y: 0
+    },
+    position: {
+      x: 0,
+      y: 0
+    }
   })
 
   const start = (e: MouseEvent) => {
-    // 获取元素相对于视窗的位置
-    const rect = target.value.getBoundingClientRect()
-    pressedDelta.x = e.pageX - rect.left
-    pressedDelta.y = e.pageY - rect.top
+    states.pressedDelta = {
+      x: e.pageX - states.target.left,
+      y: e.pageY - states.target.top
+    }
 
     document.addEventListener('mousemove', move)
     document.addEventListener('mouseup', end)
   }
 
   const move = (e: MouseEvent) => {
-    position.x = e.clientX - pressedDelta.x
-    position.y = e.clientY - pressedDelta.y
+    states.position = {
+      x: e.clientX - states.pressedDelta.x,
+      y: e.clientY - states.pressedDelta.y
+    }
 
-    target.value.style.left = `${position.x}px`
-    target.value.style.top = `${position.y}px`
+    update()
   }
 
   const end = () => {
@@ -34,15 +46,21 @@ export default function useDraggable(target: Ref) {
     document.removeEventListener('mouseup', end)
   }
 
+  const update = () => {
+    const rect = target.value.getBoundingClientRect()
+    states.target = rect.toJSON()
+
+    target.value.style.position = 'absolute'
+    target.value.style.left = `${states.position.x}px`
+    target.value.style.top = `${states.position.y}px`
+  }
+
   onMounted(() => {
     if (target) {
-      target.value.style.position = 'absolute'
+      update()
       target.value.addEventListener('mousedown', start)
     }
   })
 
-  return {
-    ...toRefs(position),
-    style: computed(() => `left:${position.x}px;top:${position.y}px;`)
-  }
+  return computed(() => states.target)
 }
