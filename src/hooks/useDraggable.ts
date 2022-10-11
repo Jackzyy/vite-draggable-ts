@@ -50,14 +50,13 @@ export default function useDraggable(target: Ref) {
   }
 
   onMounted(() => {
-    update()
     target.value.addEventListener('mousedown', start)
+    update()
   })
 
   useMutationObserver(target, () => {
     const rect = target.value.getBoundingClientRect()
     states.target = rect.toJSON()
-
     update()
   })
   return computed(() => states.target)
