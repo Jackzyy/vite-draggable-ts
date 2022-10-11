@@ -1,12 +1,12 @@
 import type { Ref } from 'vue'
 
 export default function useDraggable(ref: Ref | null) {
-  let pressedDelta = {
+  const pressedDelta = {
     x: 0,
     y: 0
   }
 
-  let position = reactive({
+  const position = reactive({
     x: 0,
     y: 0
   })
