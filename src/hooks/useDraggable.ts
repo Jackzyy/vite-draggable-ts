@@ -12,6 +12,7 @@ export default function useDraggable(target: Ref) {
   })
 
   const start = (e: MouseEvent) => {
+    // 获取元素相对于视窗的位置
     const rect = target.value.getBoundingClientRect()
     pressedDelta.x = e.pageX - rect.left
     pressedDelta.y = e.pageY - rect.top
@@ -23,6 +24,9 @@ export default function useDraggable(target: Ref) {
   const move = (e: MouseEvent) => {
     position.x = e.clientX - pressedDelta.x
     position.y = e.clientY - pressedDelta.y
+
+    target.value.style.left = `${position.x}px`
+    target.value.style.top = `${position.y}px`
   }
 
   const end = () => {
@@ -31,7 +35,10 @@ export default function useDraggable(target: Ref) {
   }
 
   onMounted(() => {
-    if (target) target.value.addEventListener('mousedown', start)
+    if (target) {
+      target.value.style.position = 'absolute'
+      target.value.addEventListener('mousedown', start)
+    }
   })
 
   return {
