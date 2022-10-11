@@ -2,19 +2,21 @@
 import useDraggable from '@/hooks/useDraggable'
 
 const emits = defineEmits(['dragging'])
-
 const dr = ref()
-const dragInfo = useDraggable(dr)
+
+const states = {
+  dragInfo: useDraggable(dr)
+}
 
 watch(
-  () => dragInfo,
+  () => states.dragInfo,
   newValue => emits('dragging', newValue),
   { deep: true }
 )
 </script>
 
 <template>
-  <div ref="dr" class="dr" :style="dragInfo.style.value">
+  <div ref="dr" class="dr" :style="states.dragInfo.style.value">
     <slot />
   </div>
 </template>
