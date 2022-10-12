@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import useMutationObserver from './useMutationObserver'
 
-export default function useDraggable(target: Ref) {
+export default function useDraggable(target: Ref, options: object = {}) {
   const states = reactive({
     target: {
       x: 0,
@@ -14,25 +14,33 @@ export default function useDraggable(target: Ref) {
       left: 0
     },
     pressedDelta: {
-      x: 0,
-      y: 0
+      left: 0,
+      top: 0
     }
   })
 
+  // 默认值
+  states.target = Object.assign(states.target, options)
+
+  const getBoundingClientRect = () => {
+    states.target = target.value.getBoundingClientRect().toJSON()
+  }
+
+  useMutationObserver(target, getBoundingClientRect)
+
   const start = (e: MouseEvent) => {
     states.pressedDelta = {
-      x: e.pageX - states.target.left,
-      y: e.pageY - states.target.top
+      left: e.pageX - states.target.left,
+      top: e.pageY - states.target.top
     }
 
     document.addEventListener('mousemove', move)
     document.addEventListener('mouseup', end)
   }
 
-  const move = (e: MouseEvent) => {
-    states.target.x = e.clientX - states.pressedDelta.x
-    states.target.y = e.clientY - states.pressedDelta.y
-    update()
+  const move = async (e: MouseEvent) => {
+    states.target.left = e.clientX - states.pressedDelta.left
+    states.target.top = e.clientY - states.pressedDelta.top
   }
 
   const end = () => {
@@ -40,25 +48,13 @@ export default function useDraggable(target: Ref) {
     document.removeEventListener('mouseup', end)
   }
 
-  const update = () => {
-    target.value.style.position = 'absolute'
-    target.value.style.left = `${states.target.x}px`
-    target.value.style.top = `${states.target.y}px`
-
-    const rect = target.value.getBoundingClientRect()
-    states.target = rect.toJSON()
-  }
-
   onMounted(() => {
     target.value.addEventListener('mousedown', start)
-    update()
+    getBoundingClientRect()
   })
 
-  useMutationObserver(target, () => {
-    const rect = target.value.getBoundingClientRect()
-    states.target = rect.toJSON()
-    update()
-  })
-
-  return toRef(states, 'target')
+  return {
+    target: toRef(states, 'target'),
+    style: computed(() => `left: ${states.target.left}px;top: ${states.target.top}px`)
+  }
 }

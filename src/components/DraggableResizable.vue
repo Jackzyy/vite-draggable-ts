@@ -5,7 +5,7 @@ const emits = defineEmits(['dragging'])
 const dr = ref()
 
 const states = reactive({
-  dragStyle: useDraggable(dr),
+  dragStyle: useDraggable(dr, { top: 100, left: 100 }),
   dragPoints: ['tl', 'tm', 'tr', 'rm', 'br', 'bm', 'bl', 'lm'], // 上左、上中、上右、右中、下右、下中、下左、左中
   dragPointsCursor: {
     tl: 'nw',
@@ -26,7 +26,7 @@ watch(
 )
 
 const setPointStyle = (point: string) => {
-  const { width, height } = states.dragStyle
+  const { width, height } = states.dragStyle.target
   let left = 0
   let top = 0
 
@@ -58,12 +58,12 @@ const setPointStyle = (point: string) => {
 }
 
 const handleClick = () => {
-  dr.value.style.left = '250px'
+  states.dragStyle.target.left = 250
 }
 </script>
 
 <template>
-  <div ref="dr" class="dr">
+  <div ref="dr" class="dr" :style="states.dragStyle.style">
     <div
       v-for="item in states.dragPoints"
       :key="item"
@@ -83,6 +83,7 @@ const handleClick = () => {
   touch-action: none;
   user-select: none;
   outline: 1px solid #70c0ff;
+  position: absolute;
   &:hover {
     cursor: move;
   }
