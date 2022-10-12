@@ -1,7 +1,12 @@
 import type { Ref } from 'vue'
 
-export default function useResizeObserver(target: Ref, callback: MutationCallback) {
+export default function useResizeObserver(
+  target: Ref,
+  callback: MutationCallback,
+  options?: MutationObserverInit | undefined
+) {
   let observer: MutationObserver | undefined
+  options = options ?? { attributes: true }
 
   const cleanup = () => {
     if (observer) {
@@ -16,7 +21,7 @@ export default function useResizeObserver(target: Ref, callback: MutationCallbac
       cleanup()
 
       observer = new MutationObserver(callback)
-      observer.observe(target.value, { attributes: true })
+      observer.observe(target.value, options)
     },
     { flush: 'post' }
   )

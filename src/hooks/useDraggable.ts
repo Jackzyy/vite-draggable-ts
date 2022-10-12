@@ -59,5 +59,6 @@ export default function useDraggable(target: Ref) {
     states.target = rect.toJSON()
     update()
   })
-  return computed(() => states.target)
+
+  return toRef(states, 'target')
 }

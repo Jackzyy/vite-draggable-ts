@@ -1,7 +1,12 @@
 import type { Ref } from 'vue'
 
-export default function useResizeObserver(target: Ref, callback: ResizeObserverCallback) {
+export default function useResizeObserver(
+  target: Ref,
+  callback: ResizeObserverCallback,
+  options?: ResizeObserverOptions | undefined
+) {
   let observer: ResizeObserver | undefined
+  options = options ?? {}
 
   const cleanup = () => {
     if (observer) {
@@ -16,7 +21,7 @@ export default function useResizeObserver(target: Ref, callback: ResizeObserverC
       cleanup()
 
       observer = new ResizeObserver(callback)
-      observer.observe(target.value)
+      observer.observe(target.value, options)
     },
     { flush: 'post' }
   )
