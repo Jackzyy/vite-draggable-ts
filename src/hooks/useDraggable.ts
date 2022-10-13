@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import useMutationObserver from './useMutationObserver'
 
-export default function useDraggable(target: Ref, options: object = {}) {
+export default function useDraggable(target: Ref, options = {}) {
   const states = reactive({
     target: {
       x: 0,

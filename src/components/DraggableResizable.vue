@@ -5,7 +5,7 @@ const emits = defineEmits(['dragging'])
 const dr = ref()
 
 const states = reactive({
-  dragStyle: useDraggable(dr, { top: 100, left: 100 }),
+  dragStyles: useDraggable(dr, { top: 100, left: 100 }),
   dragPoints: ['tl', 'tm', 'tr', 'rm', 'br', 'bm', 'bl', 'lm'], // 上左、上中、上右、右中、下右、下中、下左、左中
   dragPointsCursor: {
     tl: 'nw',
@@ -20,13 +20,13 @@ const states = reactive({
 })
 
 watch(
-  () => states.dragStyle,
+  () => states.dragStyles,
   newValue => emits('dragging', newValue),
   { immediate: true, deep: true }
 )
 
 const setPointStyle = (point: string) => {
-  const { width, height } = states.dragStyle.target
+  const { width, height } = states.dragStyles.target
   let left = 0
   let top = 0
 
@@ -57,21 +57,25 @@ const setPointStyle = (point: string) => {
   return style
 }
 
-const handleClick = () => {
-  states.dragStyle.target.left = 250
+const handleResize = (point: string, e: MouseEvent) => {
+  e.stopPropagation()
+  e.preventDefault()
+
+  console.log(point)
 }
 </script>
 
 <template>
-  <div ref="dr" class="dr" :style="states.dragStyle.style">
+  <div ref="dr" class="dr" :style="states.dragStyles.style">
     <div
-      v-for="item in states.dragPoints"
-      :key="item"
+      v-for="point in states.dragPoints"
+      :key="point"
+      :ref="point"
+      :style="setPointStyle(point)"
+      :class="point"
       class="point"
-      :class="item"
-      :style="setPointStyle(item)"
+      @mousedown="$event => handleResize(point, $event)"
     />
-    <el-button type="primary" @click="handleClick">primary2</el-button>
     <slot />
   </div>
 </template>
