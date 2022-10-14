@@ -14,8 +14,8 @@ export default function useDraggable(target: Ref, options = {}) {
       left: 0
     },
     pressedDelta: {
-      left: 0,
-      top: 0
+      offsetX: 0,
+      offsetY: 0
     }
   })
 
@@ -30,8 +30,8 @@ export default function useDraggable(target: Ref, options = {}) {
 
   const start = (e: MouseEvent) => {
     states.pressedDelta = {
-      left: e.pageX - states.target.left,
-      top: e.pageY - states.target.top
+      offsetX: e.pageX - states.target.left,
+      offsetY: e.pageY - states.target.top
     }
 
     document.addEventListener('mousemove', move)
@@ -39,8 +39,8 @@ export default function useDraggable(target: Ref, options = {}) {
   }
 
   const move = async (e: MouseEvent) => {
-    states.target.left = e.clientX - states.pressedDelta.left
-    states.target.top = e.clientY - states.pressedDelta.top
+    states.target.left = e.clientX - states.pressedDelta.offsetX
+    states.target.top = e.clientY - states.pressedDelta.offsetY
   }
 
   const end = () => {
@@ -55,6 +55,9 @@ export default function useDraggable(target: Ref, options = {}) {
 
   return {
     target: toRef(states, 'target'),
-    position: computed(() => `left: ${states.target.left}px;top: ${states.target.top}px`)
+    position: computed(
+      () =>
+        `width:${states.target.width}px;height:${states.target.height}px;left: ${states.target.left}px;top: ${states.target.top}px`
+    )
   }
 }
