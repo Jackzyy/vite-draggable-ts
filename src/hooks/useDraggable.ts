@@ -55,6 +55,6 @@ export default function useDraggable(target: Ref, options = {}) {
 
   return {
     target: toRef(states, 'target'),
-    style: computed(() => `left: ${states.target.left}px;top: ${states.target.top}px`)
+    position: computed(() => `left: ${states.target.left}px;top: ${states.target.top}px`)
   }
 }

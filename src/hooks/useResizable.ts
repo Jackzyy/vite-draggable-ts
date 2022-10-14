@@ -1,6 +1,6 @@
-import type { Ref } from 'vue'
+import type { CSSProperties } from 'vue'
 
-export default function useResizable(target: Ref) {
+export default function useResizable() {
   const points = ['tl', 'tm', 'tr', 'rm', 'br', 'bm', 'bl', 'lm']
   const pointsCursor = {
     tl: 'nw',
@@ -13,11 +13,9 @@ export default function useResizable(target: Ref) {
     lm: 'w'
   }
 
-  const setPointStyle = (point: string) => {
-    const { width, height } = target.value.getBoundingClientRect().toJSON()
+  const setPointStyle = (point: string, width: number, height: number): CSSProperties => {
     let left = 0
     let top = 0
-
     if (point.includes('m')) {
       // 四个角居中点
       if (point.includes('t') || point.includes('b')) {
