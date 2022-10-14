@@ -1,11 +1,43 @@
 <script setup lang="ts">
 import useDraggable from '@/hooks/useDraggable'
 
+const props = defineProps({
+  t: {
+    type: Number,
+    default: 0
+  },
+  l: {
+    type: Number,
+    default: 0
+  },
+  w: {
+    type: Number,
+    default: 100
+  },
+  h: {
+    type: Number,
+    default: 100
+  },
+  minWidth: {
+    type: Number,
+    default: 50
+  },
+  minHeight: {
+    type: Number,
+    default: 50
+  }
+})
+
 const root = ref()
 const emits = defineEmits(['dragging'])
 
 // 拖拽功能
-const { target, position } = useDraggable(root, { top: 100, left: 100, width: 100, height: 100 })
+const { target, position } = useDraggable(root, {
+  top: props.t,
+  left: props.l,
+  width: props.w,
+  height: props.h
+})
 watch(
   () => target.value,
   newValue => emits('dragging', newValue),
@@ -53,14 +85,18 @@ const setPointStyle = (point: string, width: number, height: number) => {
 
   return style
 }
-const handleResize = (point: string, $event: MouseEvent) => {
+const handleResize = async (point: string, $event: MouseEvent) => {
   $event.stopPropagation()
   $event.preventDefault()
+  await nextTick()
 
   const top = target.value.top
   const left = target.value.left
   const width = target.value.width
   const height = target.value.height
+  const { minWidth, minHeight } = props
+  const minLeft = left + (width - minWidth)
+  const minTop = top + (height - minHeight)
 
   const move = (e: MouseEvent) => {
     // 移动的距离
@@ -68,10 +104,10 @@ const handleResize = (point: string, $event: MouseEvent) => {
     const diffY = e.pageY - $event.pageY
 
     if (point === 'tl') {
-      target.value.width = width - diffX
-      target.value.height = height - diffY
-      target.value.top = top + diffY
-      target.value.left = left + diffX
+      target.value.width = width - diffX < minWidth ? minWidth : width - diffX
+      target.value.height = height - diffY < minHeight ? minHeight : height - diffY
+      target.value.left = width - diffX < minWidth ? minLeft : left + diffX
+      target.value.top = height - diffY < minHeight ? minTop : top + diffY
     }
     if (point === 'tm') {
       target.value.width = width
@@ -115,6 +151,15 @@ const handleResize = (point: string, $event: MouseEvent) => {
       target.value.top = top
       target.value.left = left + diffX
     }
+
+    // if (target.value.width < minWidth) {
+    //   target.value.width = minWidth
+    //   target.value.left = minLeft
+    // }
+    // if (target.value.height < minHeight) {
+    //   target.value.height = minHeight
+    //   target.value.top = minHeight
+    // }
   }
 
   const end = () => {
@@ -147,8 +192,8 @@ const handleResize = (point: string, $event: MouseEvent) => {
   width: 500px;
   height: 500px;
   touch-action: none;
-  user-select: none;
   outline: 1px solid #70c0ff;
+  user-select: none;
   position: absolute;
   &:hover {
     cursor: move;
