@@ -40,7 +40,11 @@ const { target, position } = useDraggable(root, {
 })
 watch(
   () => target.value,
-  newValue => emits('dragging', newValue),
+  newValue =>
+    emits('dragging', {
+      ...newValue,
+      props
+    }),
   { immediate: true, deep: true }
 )
 
@@ -85,16 +89,17 @@ const setPointStyle = (point: string, width: number, height: number) => {
 
   return style
 }
-const handleResize = (point: string, $event: MouseEvent) => {
-  $event.stopPropagation()
-  $event.preventDefault()
+const handleResize = (point: string, $startEvent: MouseEvent) => {
+  $startEvent.stopPropagation()
+  $startEvent.preventDefault()
 
+  // 初始点位信息
   const top = target.value.top
   const left = target.value.left
   const width = target.value.width
   const height = target.value.height
 
-  const move = (e: MouseEvent) => {
+  const move = ($moveEvent: MouseEvent) => {
     const hasT = point.includes('t')
     const hasR = point.includes('r')
     const hasB = point.includes('b')
@@ -107,8 +112,8 @@ const handleResize = (point: string, $event: MouseEvent) => {
     // 移动的距离
     // 1，X负数时，向左移动，正数时，向右移动
     // 2，Y负数时，向上移动，正数时，向下移动
-    const diffX = e.pageX - $event.pageX
-    const diffY = e.pageY - $event.pageY
+    const diffX = $moveEvent.pageX - $startEvent.pageX
+    const diffY = $moveEvent.pageY - $startEvent.pageY
 
     // 计算各个点移动过程中，宽高的变化
     // 1，如果是上下位置的中间点位，则移动中的宽度变化为0。如果不是中间，如果是左点位则取反值，如果是右点位取正值

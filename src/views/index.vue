@@ -15,7 +15,15 @@ const onDragB = (val: any) => {
 
 <template>
   <main>
-    <draggable-resizable :t="300" :l="300" :w="300" :h="300" @dragging="onDragA">
+    <draggable-resizable
+      :t="300"
+      :l="300"
+      :w="300"
+      :h="300"
+      :min-width="100"
+      :min-height="100"
+      @dragging="onDragA"
+    >
       <el-button type="primary">primary</el-button>
       <pre>{{ states.positionA }}</pre>
     </draggable-resizable>
