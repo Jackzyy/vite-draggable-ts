@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import useMutationObserver from './useMutationObserver'
+import { isEqual, cloneDeep } from 'lodash-es'
 
 export default function useDraggable(target: Ref, options = {}) {
   const states = reactive({
@@ -19,14 +19,26 @@ export default function useDraggable(target: Ref, options = {}) {
     }
   })
 
+  watch(
+    () => cloneDeep(states.target),
+    (newValue, oldValue) => {
+      if (isEqual(newValue, oldValue)) return
+      getBoundingClientRect()
+    },
+    { deep: true }
+  )
+
+  onMounted(() => {
+    target.value.addEventListener('mousedown', start)
+  })
+
   // 默认值
   states.target = Object.assign(states.target, options)
 
-  const getBoundingClientRect = () => {
+  const getBoundingClientRect = async () => {
+    await nextTick()
     states.target = target.value.getBoundingClientRect().toJSON()
   }
-
-  useMutationObserver(target, getBoundingClientRect)
 
   const start = (e: MouseEvent) => {
     states.pressedDelta = {
@@ -47,11 +59,6 @@ export default function useDraggable(target: Ref, options = {}) {
     document.removeEventListener('mousemove', move)
     document.removeEventListener('mouseup', end)
   }
-
-  onMounted(() => {
-    target.value.addEventListener('mousedown', start)
-    getBoundingClientRect()
-  })
 
   return {
     target: toRef(states, 'target'),

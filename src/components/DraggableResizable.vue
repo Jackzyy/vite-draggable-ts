@@ -119,6 +119,7 @@ const handleResize = (point: string, $event: MouseEvent) => {
     const { minWidth, minHeight } = props
     const isLTMinWidth = diffWidth < minWidth
     const isLTMinHeight = diffHeight < minHeight
+
     // 处理超出临界高度的定位
     // 1，如果是上左，则临界 X定位=x坐标+宽度-最小宽度，Y定位=Y坐标+高度-最小高度
     // 2，如果是下右，则临界 X定位=X坐标，Y定位=Y坐标
