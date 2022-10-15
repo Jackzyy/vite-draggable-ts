@@ -1,43 +1,9 @@
 <script setup lang="ts">
-import DraggableResizable from '@/components/DraggableResizable.vue'
-
-const states = reactive({
-  positionA: {},
-  positionB: {}
-})
-const onDragA = (val: any) => {
-  states.positionA = val
-}
-const onDragB = (val: any) => {
-  states.positionB = val
-}
+import Editor from '@/components/Editor/index.vue'
 </script>
 
 <template>
-  <main>
-    <draggable-resizable
-      :t="300"
-      :l="300"
-      :w="300"
-      :h="300"
-      :min-width="100"
-      :min-height="100"
-      @dragging="onDragA"
-    >
-      <el-button type="primary">primary</el-button>
-      <pre>{{ states.positionA }}</pre>
-    </draggable-resizable>
-
-    <draggable-resizable @dragging="onDragB">
-      <el-button type="primary">primary</el-button>
-      <pre>{{ states.positionB }}</pre>
-    </draggable-resizable>
-  </main>
+  <Editor />
 </template>
 
-<style lang="scss" scoped>
-main {
-  width: 100vw;
-  height: 100vh;
-}
-</style>
+<style lang="scss" scoped></style>
