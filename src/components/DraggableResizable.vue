@@ -85,81 +85,43 @@ const setPointStyle = (point: string, width: number, height: number) => {
 
   return style
 }
-const handleResize = async (point: string, $event: MouseEvent) => {
+const handleResize = (point: string, $event: MouseEvent) => {
   $event.stopPropagation()
   $event.preventDefault()
-  await nextTick()
 
   const top = target.value.top
   const left = target.value.left
   const width = target.value.width
   const height = target.value.height
-  const { minWidth, minHeight } = props
-  const minLeft = left + (width - minWidth)
-  const minTop = top + (height - minHeight)
 
   const move = (e: MouseEvent) => {
+    const hasT = point.includes('t')
+    const hasR = point.includes('r')
+    const hasB = point.includes('b')
+    const hasL = point.includes('l')
+    const hasM = point.includes('m')
+    const hasTBM = (hasT || hasB) && hasM
+    const hasLRM = (hasL || hasR) && hasM
+
     // 移动的距离
+    // 1，X负数时，向左移动，正数时，向右移动
+    // 2，Y负数时，向上移动，正数时，向下移动
     const diffX = e.pageX - $event.pageX
     const diffY = e.pageY - $event.pageY
 
-    if (point === 'tl') {
-      target.value.width = width - diffX < minWidth ? minWidth : width - diffX
-      target.value.height = height - diffY < minHeight ? minHeight : height - diffY
-      target.value.left = width - diffX < minWidth ? minLeft : left + diffX
-      target.value.top = height - diffY < minHeight ? minTop : top + diffY
-    }
-    if (point === 'tm') {
-      target.value.width = width
-      target.value.height = height - diffY
-      target.value.top = top + diffY
-      target.value.left = left
-    }
-    if (point === 'tr') {
-      target.value.width = width + diffX
-      target.value.height = height - diffY
-      target.value.top = top + diffY
-      target.value.left = left
-    }
-    if (point === 'rm') {
-      target.value.width = width + diffX
-      target.value.height = height
-      target.value.top = top
-      target.value.left = left
-    }
-    if (point === 'br') {
-      target.value.width = width + diffX
-      target.value.height = height + diffY
-      target.value.top = top
-      target.value.left = left
-    }
-    if (point === 'bm') {
-      target.value.width = width
-      target.value.height = height + diffY
-      target.value.top = top
-      target.value.left = left
-    }
-    if (point === 'bl') {
-      target.value.width = width - diffX
-      target.value.height = height + diffY
-      target.value.top = top
-      target.value.left = left + diffX
-    }
-    if (point === 'lm') {
-      target.value.width = width - diffX
-      target.value.height = height
-      target.value.top = top
-      target.value.left = left + diffX
-    }
+    const diffWidth = width + (hasTBM ? 0 : hasL ? -diffX : diffX)
+    const diffHeight = height + (hasLRM ? 0 : hasT ? -diffY : diffY)
 
-    // if (target.value.width < minWidth) {
-    //   target.value.width = minWidth
-    //   target.value.left = minLeft
-    // }
-    // if (target.value.height < minHeight) {
-    //   target.value.height = minHeight
-    //   target.value.top = minHeight
-    // }
+    const { minWidth, minHeight } = props
+    const isLTMinWidth = diffWidth < minWidth
+    const isLTMinHeight = diffHeight < minHeight
+    const minLeft = hasT || hasL ? left + (width - minWidth) : left
+    const minTop = hasT || hasL ? top + (height - minHeight) : top
+
+    target.value.width = isLTMinWidth ? minWidth : diffWidth
+    target.value.height = isLTMinHeight ? minHeight : diffHeight
+    target.value.left = isLTMinWidth ? minLeft : left + (hasL ? diffX : 0)
+    target.value.top = isLTMinHeight ? minTop : top + (hasT ? diffY : 0)
   }
 
   const end = () => {

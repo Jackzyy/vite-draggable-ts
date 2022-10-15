@@ -2,23 +2,27 @@
 import DraggableResizable from '@/components/DraggableResizable.vue'
 
 const states = reactive({
-  position: {}
+  positionA: {},
+  positionB: {}
 })
-const onDrag = (val: any) => {
-  states.position = val
+const onDragA = (val: any) => {
+  states.positionA = val
+}
+const onDragB = (val: any) => {
+  states.positionB = val
 }
 </script>
 
 <template>
   <main>
-    <draggable-resizable @dragging="onDrag">
+    <draggable-resizable :t="300" :l="300" :w="300" :h="300" @dragging="onDragA">
       <el-button type="primary">primary</el-button>
-      <pre>{{ states.position }}</pre>
+      <pre>{{ states.positionA }}</pre>
     </draggable-resizable>
 
-    <draggable-resizable @dragging="onDrag">
+    <draggable-resizable @dragging="onDragB">
       <el-button type="primary">primary</el-button>
-      <pre>{{ states.position }}</pre>
+      <pre>{{ states.positionB }}</pre>
     </draggable-resizable>
   </main>
 </template>
