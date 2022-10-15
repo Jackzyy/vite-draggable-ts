@@ -100,6 +100,7 @@ const handleResize = (point: string, $event: MouseEvent) => {
     const hasB = point.includes('b')
     const hasL = point.includes('l')
     const hasM = point.includes('m')
+    const hasTL = hasT || hasL
     const hasTBM = (hasT || hasB) && hasM
     const hasLRM = (hasL || hasR) && hasM
 
@@ -109,14 +110,20 @@ const handleResize = (point: string, $event: MouseEvent) => {
     const diffX = e.pageX - $event.pageX
     const diffY = e.pageY - $event.pageY
 
+    // 计算各个点移动过程中，宽高的变化
+    // 1，如果是上下位置的中间点位，则移动中的宽度变化为0。如果不是中间，如果是左点位则取反值，如果是右点位取正值
+    // 2，如果是左右的中间点位，则移动中的高度变化为0.如果不是中间，如果是上点位则取反值，如果是右点位取正值
     const diffWidth = width + (hasTBM ? 0 : hasL ? -diffX : diffX)
     const diffHeight = height + (hasLRM ? 0 : hasT ? -diffY : diffY)
 
     const { minWidth, minHeight } = props
     const isLTMinWidth = diffWidth < minWidth
     const isLTMinHeight = diffHeight < minHeight
-    const minLeft = hasT || hasL ? left + (width - minWidth) : left
-    const minTop = hasT || hasL ? top + (height - minHeight) : top
+    // 处理超出临界高度的定位
+    // 1，如果是上左，则临界 X定位=x坐标+宽度-最小宽度，Y定位=Y坐标+高度-最小高度
+    // 2，如果是下右，则临界 X定位=X坐标，Y定位=Y坐标
+    const minLeft = hasTL ? left + (width - minWidth) : left
+    const minTop = hasTL ? top + (height - minHeight) : top
 
     target.value.width = isLTMinWidth ? minWidth : diffWidth
     target.value.height = isLTMinHeight ? minHeight : diffHeight
