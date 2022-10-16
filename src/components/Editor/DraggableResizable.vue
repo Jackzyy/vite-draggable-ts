@@ -6,8 +6,6 @@ import { useEditorStore } from '@/stores/editor'
 const editStore = useEditorStore()
 const { components, activeComponent } = storeToRefs(editStore)
 
-const root = ref()
-
 const props = defineProps({
   id: {
     type: Number,
@@ -40,21 +38,28 @@ const props = defineProps({
 })
 
 // 拖拽功能
-const { target, position } = useDraggable(root, {
-  top: props.t,
-  left: props.l,
-  width: props.w,
-  height: props.h
-})
+const componentIndex = findIndex(components.value, { id: props.id })
+const componentClientRect = toRef(components.value[componentIndex], 'clientRect')
+
+const defaultConfig = {
+  ...{
+    top: props.t,
+    left: props.l,
+    width: props.w,
+    height: props.h
+  },
+  ...componentClientRect.value
+}
+
+const root = ref()
+const { target, position } = useDraggable(root, defaultConfig)
+
 watch(
   () => target.value,
   newValue => {
     // 更新Store组件数据
-    const index = findIndex(components.value, { id: props.id })
-    if (index !== -1) {
-      components.value[index].clientRect = newValue
-      activeComponent.value = newValue
-    }
+    componentClientRect.value = newValue
+    activeComponent.value = newValue
   },
   { deep: true }
 )
