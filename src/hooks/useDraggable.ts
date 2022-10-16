@@ -1,5 +1,4 @@
 import type { Ref } from 'vue'
-import { isEqual, cloneDeep } from 'lodash-es'
 
 export default function useDraggable(target: Ref, options = {}) {
   const states = reactive({
@@ -19,17 +18,10 @@ export default function useDraggable(target: Ref, options = {}) {
     }
   })
 
-  watch(
-    () => cloneDeep(states.target),
-    (newValue, oldValue) => {
-      if (isEqual(newValue, oldValue)) return
-      getBoundingClientRect()
-    },
-    { deep: true }
-  )
-
   onMounted(() => {
     target.value.addEventListener('mousedown', start)
+
+    getBoundingClientRect()
   })
 
   // 默认值
@@ -40,7 +32,7 @@ export default function useDraggable(target: Ref, options = {}) {
     states.target = target.value.getBoundingClientRect().toJSON()
   }
 
-  const start = (e: MouseEvent) => {
+  const start = async (e: MouseEvent) => {
     states.pressedDelta = {
       offsetX: e.pageX - states.target.left,
       offsetY: e.pageY - states.target.top
@@ -48,11 +40,15 @@ export default function useDraggable(target: Ref, options = {}) {
 
     document.addEventListener('mousemove', move)
     document.addEventListener('mouseup', end)
+
+    getBoundingClientRect()
   }
 
   const move = async (e: MouseEvent) => {
     states.target.left = e.clientX - states.pressedDelta.offsetX
     states.target.top = e.clientY - states.pressedDelta.offsetY
+
+    getBoundingClientRect()
   }
 
   const end = () => {

@@ -1,36 +1,26 @@
 <script setup lang="ts">
 import DraggableResizable from './DraggableResizable.vue'
+import { useEditorStore } from '@/stores/editor'
 
-const states = reactive({
-  positionA: {},
-  positionB: {}
-})
-const onDragA = (val: any) => {
-  states.positionA = val
-}
-const onDragB = (val: any) => {
-  states.positionB = val
-}
+const editStore = useEditorStore()
+const { components, activeComponent } = storeToRefs(editStore)
 </script>
 
 <template>
-  <main>
-    <draggable-resizable
-      :t="300"
-      :l="300"
-      :w="300"
-      :h="300"
-      :min-width="100"
-      :min-height="100"
-      @dragging="onDragA"
-    >
-      <pre>{{ states.positionA }}</pre>
-    </draggable-resizable>
+  <pre>{{ components }}</pre>
+  <pre>{{ activeComponent }}</pre>
 
-    <draggable-resizable @dragging="onDragB">
-      <pre>{{ states.positionB }}</pre>
-    </draggable-resizable>
-  </main>
+  <draggable-resizable
+    v-for="component in components"
+    :id="component.id"
+    :key="component.id"
+    :t="component.props.defaultClientRect.t"
+    :l="component.props.defaultClientRect.l"
+    :w="component.props.defaultClientRect.w"
+    :h="component.props.defaultClientRect.h"
+    :min-width="component.props.defaultClientRect.minWidth"
+    :min-height="component.props.defaultClientRect.minHeight"
+  ></draggable-resizable>
 </template>
 
 <style lang="scss" scoped>

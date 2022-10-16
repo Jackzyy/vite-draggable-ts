@@ -1,9 +1,37 @@
 export const useEditorStore = defineStore('editor', () => {
-  const states = reactive({
-    // 编辑器组件信息
-    components: {},
-    // 被选中的组件信息
-    activeComponent: {}
-  })
-  return { states }
+  const components = ref([
+    {
+      id: 1,
+      active: true,
+      clientRect: {},
+      props: {
+        defaultClientRect: {
+          t: 300,
+          l: 300,
+          w: 300,
+          h: 300,
+          minWidth: 100,
+          minHeight: 100
+        }
+      }
+    },
+    {
+      id: 2,
+      active: true,
+      clientRect: {},
+      props: {
+        defaultClientRect: {
+          t: 500,
+          l: 500,
+          w: 300,
+          h: 300,
+          minWidth: 100,
+          minHeight: 100
+        }
+      }
+    }
+  ])
+  const activeComponent = ref({})
+
+  return { components, activeComponent }
 })

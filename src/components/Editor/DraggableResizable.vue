@@ -1,7 +1,18 @@
 <script setup lang="ts">
+import { findIndex } from 'lodash-es'
 import useDraggable from '@/hooks/useDraggable'
+import { useEditorStore } from '@/stores/editor'
+
+const editStore = useEditorStore()
+const { components, activeComponent } = storeToRefs(editStore)
+
+const root = ref()
 
 const props = defineProps({
+  id: {
+    type: Number,
+    default: 0
+  },
   t: {
     type: Number,
     default: 0
@@ -28,9 +39,6 @@ const props = defineProps({
   }
 })
 
-const root = ref()
-const emits = defineEmits(['dragging'])
-
 // 拖拽功能
 const { target, position } = useDraggable(root, {
   top: props.t,
@@ -40,12 +48,15 @@ const { target, position } = useDraggable(root, {
 })
 watch(
   () => target.value,
-  newValue =>
-    emits('dragging', {
-      ...newValue,
-      props
-    }),
-  { immediate: true, deep: true }
+  newValue => {
+    // 更新Store组件数据
+    const index = findIndex(components.value, { id: props.id })
+    if (index !== -1) {
+      components.value[index].clientRect = newValue
+      activeComponent.value = newValue
+    }
+  },
+  { deep: true }
 )
 
 // 放大缩小点位以及功能
